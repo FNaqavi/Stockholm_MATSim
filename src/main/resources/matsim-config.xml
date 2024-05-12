@@ -271,12 +271,13 @@
 
     <module name="changeMode">
         <param name="modeSwitchBehavior" value="fromSpecifiedModesToSpecifiedModes"/>
-        <param name="modes" value="car,pt"/>
+        <param name="modes" value="car,pt,drt"/>
     </module>
 
     <module name="subtourModeChoice">
         <!-- Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car -->
         <param name="chainBasedModes" value="car, bike"/>
+        <param name="modes" value="car,pt,bike,walk,drt" />
     </module>
 
     <module name="timeAllocationMutator">
