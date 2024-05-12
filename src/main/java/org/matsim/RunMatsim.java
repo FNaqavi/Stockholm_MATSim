@@ -20,18 +20,21 @@ package org.matsim;
 
 
 import java.net.URL;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
-import org.matsim.contrib.roadpricing.RoadPricingModule;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeUsingTollFactor;
-import org.matsim.contrib.roadpricing.TollFactor;
+import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
 
 public class RunMatsim {
 
@@ -51,28 +54,48 @@ public class RunMatsim {
         config.controller().setOverwriteFileSetting((OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists));
 
         //load config into scenario
-        final Scenario scenario = ScenarioUtils.loadScenario(config);
+        Scenario scenario = createScenarioWithDrtRouteFactory(config);
+        ScenarioUtils.loadScenario(scenario);
+
+        //split parallel links between same nodes
+        NetworkSegmentDoubleLinks algorithm = new NetworkSegmentDoubleLinks();
+        algorithm.run(scenario.getNetwork());
 
         // define the toll factor as an anonymous class.  If more flexibility is needed, convert to "full" class.
         TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
+            //          if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
             if(scenario.getVehicles().getVehicles().get(vehicleId) == null){
                 return 0;
-                } else if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            };
+            } else if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
 
         // instantiate the road pricing scheme, with the toll factor inserted:
         URL roadpricingUrl;
         roadpricingUrl = IOUtils.extendUrl(config.getContext(), rpConfig.getTollLinksFile());
-        RoadPricingSchemeUsingTollFactor stuff = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
+        RoadPricingSchemeUsingTollFactor rpricing = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
+
+        MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+        DvrpConfigGroup dvrpConfigGroup = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+        //MultiModeTaxiConfigGroup multiModeTaxiConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeTaxiConfigGroup.class);
+
+        config.checkConsistency();
+        MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+        DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+
+        Controler controler = new Controler(scenario);
+        controler.addOverridingModule(new DvrpModule());
+        controler.addOverridingModule(new MultiModeDrtModule());
+        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
         //create Controller and run
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule( new RoadPricingModule( stuff ) );
+        controler.addOverridingModule(new RoadPricingModule( rpricing ));
+
 
         controler.run();
+
     }
 }
