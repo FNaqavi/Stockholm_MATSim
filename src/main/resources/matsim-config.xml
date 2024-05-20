@@ -21,7 +21,7 @@
         Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
         For 'qsim', add a module 'qsim' to the config. -->
         <!--  type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks &ndash -->
-        <param name="routingAlgorithmType" value="SpeedyALT"/>   <!--changed-->
+        <param name="routingAlgorithmType" value="Dijkstra"/>  <!-- previous value FastAStarLandmarks&ndash -->
         <param name="mobsim" value="qsim"/>
         <param name="overwriteFiles" value="deleteDirectoryIfExists"/>
         <param name="outputDirectory" value="./output"/>
@@ -46,7 +46,7 @@
     <module name="replanning">
         <param name="maxAgentPlanMemorySize" value="5"/> <!-- 0 means unlimited -->
         <param name="fractionOfIterationsToDisableInnovation"
-               value="1"/>    <!-- 0.3 is good --> <!-- fraction of iterations where innovative strategies are switched off. if you set it to 0.8 and run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
+               value="0.5"/>    <!-- 0.3 is good --> <!-- fraction of iterations where innovative strategies are switched off. if you set it to 0.8 and run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
         <param name="planSelectorForRemoval" value="WorstPlanForRemovalSelectorWithConflicts"/>
         <parameterset type="strategysettings">
             <param name="strategyName" value="ReRoute"/>
@@ -54,7 +54,7 @@
         </parameterset>
         <parameterset type="strategysettings">
             <param name="strategyName" value="SelectExpBeta"/>
-            <param name="weight" value="0.80"/>  <!-- it was originally set to 0.75-->
+            <param name="weight" value="1"/>  <!-- it was originally set to 0.75-->
         </parameterset>
         <parameterset type="strategysettings">
             <param name="strategyName" value="TimeAllocationMutator"/>
@@ -93,7 +93,7 @@
 
     <module name="counts">
         <!-- Transport modes that will be respected for the counts comparison. 'car' is default, which includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true! -->
-        <param name="analyzedModes" value="car"/>
+        <param name="analyzedModes" value="car, drt"/>
         <!-- Specifies over how many iterations the link volumes should be averaged that are used for the counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeCountsInterval -->
         <param name="averageCountsOverIterations" value="5"/>
         <!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
@@ -127,7 +127,7 @@
     </module>
 
     <module name="travelTimeCalculator">
-        <param name="analyzedModes" value="car"/>
+        <param name="analyzedModes" value="car, drt"/>
         <param name="calculateLinkToLinkTravelTimes" value="false"/>
         <param name="calculateLinkTravelTimes" value="true"/>
         <param name="filterModes" value="false"/>
@@ -138,7 +138,7 @@
         <!-- How to deal with congested time bins that have no link entry events. `optimistic' assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic. -->
         <param name="travelTimeAggregator" value="optimistic"/>
         <!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
-        <param name="travelTimeBinSize" value="7200"/>
+        <param name="travelTimeBinSize" value="600"/>
         <!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
         <param name="travelTimeGetter" value="average"/>
     </module>
@@ -257,13 +257,13 @@
         </parameterset>
         <parameterset type="teleportedModeParameters">
             <param name="mode" value="walk"/>
-            <!--param name="beelineDistanceFactor" value="1.5"/-->
+            <param name="beelineDistanceFactor" value="null"/>
             <param name="teleportedModeSpeed" value="0.5"/>
             <param name="teleportedModeFreespeedFactor" value="null"/>
         </parameterset>
         <parameterset type="teleportedModeParameters">
             <param name="mode" value="bike"/>
-            <!--param name="beelineDistanceFactor" value="1.5"/ -->
+            <param name="beelineDistanceFactor" value="null"/>
             <param name="teleportedModeSpeed" value="2.6"/>  <!-- 10 was good -->
             <param name="teleportedModeFreespeedFactor" value="null"/>
         </parameterset>
@@ -300,6 +300,10 @@
             <parameterset type="ExtensiveInsertionSearch"/>
             <!-- If true, the startLink is changed to last link in the current schedule, so the taxi starts the next day at the link where it stopped operating the day before. False by default. -->
             <param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+
+            <!-- allows to configure a service area per drt mode.Used with serviceArea Operational Scheme -->
+            <param name="drtServiceAreaShapeFile" value="./center.shp" />
+
             <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
             <param name="maxTravelTimeAlpha" value="1.5"/>
             <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
@@ -339,6 +343,12 @@
     </module>
 
     <module name="dvrp">
+
+        <parameterset type="travelTimeMatrix">
+            <param name="cellSize" value="1000"/>
+            <param name="maxNeighborDistance" value="10000"/>
+        </parameterset>
+
         <!-- Mode of which the network will be used for routing vehicles, calculating travel times, etc. (fleet operator's perspective). If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used -->
         <param name="networkModes" value="car"/>
         <!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
