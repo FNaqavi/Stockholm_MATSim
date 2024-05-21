@@ -64,8 +64,12 @@ public class RunMatsim {
         // define the toll factor as an anonymous class.  If more flexibility is needed, convert to "full" class.
         TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
             //          if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
-            if(scenario.getVehicles().getVehicles().get(vehicleId) == null){
-                return 0;
+            if (scenario.getVehicles().getVehicles().get(vehicleId) == null) {
+                if (vehicleId.toString().contains("taxi")) {
+                    return 1;
+                } else {
+                    return 0;
+                }
             } else if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
                 return 1;
             } else {
