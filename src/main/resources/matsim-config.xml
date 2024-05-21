@@ -115,12 +115,6 @@
     </module>
 
 
-    <!-- source: https://github.com/matsim-org/matsim-libs/blob/master/contribs/signals/examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml-->
-    <module name="counts">
-        <!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
-        <param name="countsScaleFactor" value="0.2"/>
-    </module>
-
     <module name="eventsManager">        <!-- Config name 'parallelEventHandling' is deprecated, please use 'eventsManager' instead. -->
         <!-- Oskar 2015-12-09, use 1 threads for event handling -->
         <param name="numberOfThreads" value="1"/>
@@ -130,7 +124,7 @@
         <param name="analyzedModes" value="car, drt"/>
         <param name="calculateLinkToLinkTravelTimes" value="false"/>
         <param name="calculateLinkTravelTimes" value="true"/>
-        <param name="filterModes" value="false"/>
+        <param name="filterModes" value="true"/>
         <!-- The lenght (in sec) of the time period that is splited into time bins; an additional time bin is created to aggregate all travel times collected after maxTime -->
         <param name="maxTime" value="108000"/>
         <!-- If true, link travel times are measured and calculated separately for each mode in analyzedModes. Other modes are ignored. If true, filterModes has no effect. -->
