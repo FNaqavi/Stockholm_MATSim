@@ -68,8 +68,8 @@
 
 
     <module name="qsim">
-        <param name="vehiclesSource"
-               value="defaultVehicle"/>   <!-- a medium-sized 4-seater every time a vehicle is needed -->
+<!--        <param name="vehiclesSource"
+               value="defaultVehicle"/>   &lt;!&ndash; a medium-sized 4-seater every time a vehicle is needed &ndash;&gt;-->
         <param name="flowCapacityFactor" value="0.1"/>
         <param name="storageCapacityFactor" value="0.18"/> <!-- 0.18 when flowCapacityFactor is 0.1-->
         <param name="startTime" value="00:00:00"/>
@@ -241,7 +241,7 @@
 
 
     <module name="routing">  <!-- This section is for teleported modes-->
-        <param name="beelineDistanceFactor" value="1.8"/>  <!-- This was good with 1.8-->
+        <param name="beelineDistanceFactor" value="1.7"/>  <!-- This was good with 1.8-->
         <parameterset type="teleportedModeParameters">
             <param name="mode" value="pt"/>
             <param name="beelineDistanceFactor" value="null"/>
@@ -299,22 +299,22 @@
             <param name="drtServiceAreaShapeFile" value="./center.shp" />
 
             <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
-            <param name="maxTravelTimeAlpha" value="1.5"/>
+            <param name="maxTravelTimeAlpha" value="2"/>
             <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
-            <param name="maxTravelTimeBeta" value="1200.0"/>
+            <param name="maxTravelTimeBeta" value="900.0"/>  <!--900 in Berlin, 1200 in NYC-->
             <!-- Max wait time for the bus to come (optimisation constraint). -->
-            <param name="maxWaitTime" value="1200.0"/>
+            <param name="maxWaitTime" value="600.0"/>
             <!-- Operational Scheme, either door2door or stopbased. door2door by default -->
-            <param name="operationalScheme" value="door2door"/>
+            <param name="operationalScheme" value="serviceAreaBased"/>
             <!-- Bus stop duration. -->
-            <param name="stopDuration" value="60.0"/>
+            <param name="stopDuration" value="10.0"/>
             <!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
             <param name="vehiclesFile" value="drtvehicles.xml"/>
             <!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
             <param name="writeDetailedCustomerStats" value="true"/>
             <parameterset type="zonalSystem">
                 <param name="zonesGeneration" value="GridFromNetwork"/>
-                <param name="cellSize" value="2000"/>
+                <param name="cellSize" value="500"/>  <!--500 in Berlin, 250 in NYC-->
             </parameterset>
             <parameterset type="rebalancing">
                 <parameterset type="minCostFlowRebalancingStrategy">
@@ -323,7 +323,7 @@
                 </parameterset>
             </parameterset>
             <parameterset type="drtfare">
-                <param name="basefare" value="0.5"/>
+                <param name="basefare" value="1"/>
                 <!-- Daily subscription fee (fee = positive value) -->
                 <param name="dailySubscriptionFee" value="0.0"/>
                 <!-- drt fare per meter (fee = positive value) -->
@@ -331,7 +331,7 @@
                 <!-- drt fare per hour (fee = positive value) -->
                 <param name="timeFare_h" value="3.6"/>
                 <!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
-                <param name="minFarePerTrip" value="2.0"/>
+                <param name="minFarePerTrip" value="0.0"/>   <!--was not used in Berlin or NYC cases-->
             </parameterset>
         </parameterset>
     </module>
@@ -339,8 +339,8 @@
     <module name="dvrp">
 
         <parameterset type="travelTimeMatrix">
-            <param name="cellSize" value="1000"/>
-            <param name="maxNeighborDistance" value="10000"/>
+            <param name="cellSize" value="200"/>   <!--1000 in Berlin, 200 in NYC-->
+            <param name="maxNeighborDistance" value="5000"/>   <!--10000 in Berlin, 5000 in NYC-->
         </parameterset>
 
         <!-- Mode of which the network will be used for routing vehicles, calculating travel times, etc. (fleet operator's perspective). If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used -->
