@@ -4,12 +4,12 @@
 
     <module name="global">
         <!-- Oskar 2015-12-09, use 24 threads for replanning. Shortest path algorithm. -->
-        <param name="numberOfThreads" value="22"/>
+        <param name="numberOfThreads" value="64"/>
         <param name="coordinateSystem" value="EPSG:3006"/>
     </module>
 
     <module name="network">
-        <param name="inputNetworkFile" value="./sthlm_v3.xml"/>
+        <param name="inputNetworkFile" value="sthlm_v3.xml"/>
         <param name="timeVariantNetwork" value="true"/>
     </module>
 
@@ -23,18 +23,15 @@
         <param name="routingAlgorithmType" value= "Dijkstra" />   <!--changed-->
         <param name="mobsim" value="qsim"/>
         <param name="overwriteFiles" value="deleteDirectoryIfExists"/>
-        <param name="outputDirectory" value="./output"/>
+        <param name="outputDirectory" value="output/"/>
+        <param name="overwriteFiles" value="overwriteExistingFiles"/>
         <param name="firstIteration" value="1"/>
         <param name="lastIteration" value="60"/> <!-- original value 100 -->
     </module>
 
     <module name="plans">
-        <param name="inputPlansFile" value="./matsim-plans-2040_25_June13.xml"/>
+        <param name="inputPlansFile" value="matsim-plans-2040_25_June13.xml"/>
         <parameterset type="strategySettings">
-            <param name="ChangeExpBeta" value="0.1"/>
-            <param name="beta" value="1.0"/>
-            <param name="changeExpBeta.mu" value="1.0"/>
-            <param name="changeExpBeta.lambda" value="1.0"/>
             <param name="immutableModes" value="car:h, bike:h"/>
             <!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
             <param name="networkRouteType" value="LinkNetworkRoute"/>
@@ -47,24 +44,27 @@
         <param name="fractionOfIterationsToDisableInnovation"
                value="0.5"/>    <!-- 0.3 is good --> <!-- fraction of iterations where innovative strategies are switched off. if you set it to 0.8 and run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
         <param name="planSelectorForRemoval" value="WorstPlanForRemovalSelectorWithConflicts"/>
+        
         <parameterset type="strategysettings">
             <param name="strategyName" value="ReRoute"/>
-            <param name="weight" value="0.5"/>   <!-- 0.2 is good  (last run 0.4: 0.48 car, 0.30 pt; 0.5 improved the mode share slightly, currently 0.7)-->  
+            <param name="weight" value="0.1"/>   <!-- 0.5--> <!-- 0.2 is good  (last run 0.4: 0.48 car, 0.30 pt; 0.5 improved the mode share slightly, currently 0.7)-->  
         </parameterset>
-        <parameterset type="strategysettings">
+       <parameterset type="strategysettings">
             <param name="strategyName" value="SelectExpBeta"/>
-            <param name="weight" value="1"/>  <!-- it was originally set to 0.75-->
-        </parameterset>
+            <param name="weight" value="0.6"/>   <!-- 1-->
+       </parameterset>
 
-<!--        <parameterset type="strategysettings">
+        <parameterset type="strategysettings">
             <param name="strategyName" value="TimeAllocationMutator"/>
-            <param name="weight" value="0.25"/>  &lt;!&ndash; 0.15 is good &ndash;&gt;
-        </parameterset>-->
-
+            <param name="weight" value="0.1"/>  <!-- 0.25-->
+        </parameterset>    
+            
         <parameterset type="strategysettings">
             <param name="strategyName" value="ChangeTripMode"/>
-            <param name="weight" value="0.5"/>  <!-- 0.5 is good -->
+            <param name="weight" value="0.3"/>   <!-- 0.5-->
         </parameterset>
+
+
     </module>
 
     <module name="qsim">
@@ -79,7 +79,7 @@
         <param name="linkDynamics"
                value="PassingQ"/>  <!-- allows vehicles with higher speed to exit the link sooner  -->
         <!-- Oskar 2015-12-09, use 22 threads for qsim (mobsim). Queuing simulation. -->
-        <param name="numberOfThreads" value="22"/>
+        <param name="numberOfThreads" value="64"/>
         <param name="trafficDynamics" value="kinematicWaves"/>  <!-- allows for double queue -->
         <param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
         <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="false"/>    <!--changed-->
@@ -117,7 +117,7 @@
 
     <module name="eventsManager">        <!-- Config name 'parallelEventHandling' is deprecated, please use 'eventsManager' instead. -->
         <!-- Oskar 2015-12-09, use 1 threads for event handling -->
-        <param name="numberOfThreads" value="1"/>
+        <param name="numberOfThreads" value="64"/>
     </module>
 
     <module name="travelTimeCalculator">
@@ -219,7 +219,7 @@
             <param name="dailyMonetaryConstant" value="0.0"/>
             <param name="dailyUtilityConstant" value="-0.0"/>   <!-- 0.0 -->
             <param name="constant" value="-2.0"/>
-            <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+            <param name="marginalUtilityOfDistance_util_m" value="-0.0"/>
             <param name="marginalUtilityOfTraveling_util_hr" value="-0.073"/>  <!-- -0.073 -->
             <param name="monetaryDistanceRate" value="-0.0002"/>
         </parameterset>
@@ -278,7 +278,7 @@
     </module>
 
     <module name="roadpricing">
-        <param name="tollLinksFile" value="./cordonToll1.xml"/>
+        <param name="tollLinksFile" value="cordonToll.xml"/>
     </module>
 
     <module name="vehicles">

@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim;
 
-
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
@@ -27,6 +26,7 @@ import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.contrib.roadpricing.TollFactor;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -39,14 +39,14 @@ public class RunMatsim {
 
         Config config;
         if (args == null || args.length == 0 || args[0] == null) {
-            config = ConfigUtils.loadConfig("./matsim-config.xml");
+        config = ConfigUtils.loadConfig("matsim-config.xml");
         } else {
-            config = ConfigUtils.loadConfig(args);
+        config = ConfigUtils.loadConfig(args);
         }
 
         //add RoadPricing ConfigGroup
         RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
-        rpConfig.setTollLinksFile("cordonToll1.xml");
+        rpConfig.setTollLinksFile("cordonToll.xml");
 
         config.controller().setOverwriteFileSetting((OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists));
 
@@ -67,11 +67,17 @@ public class RunMatsim {
         // instantiate the road pricing scheme, with the toll factor inserted:
         URL roadpricingUrl;
         roadpricingUrl = IOUtils.extendUrl(config.getContext(), rpConfig.getTollLinksFile());
-        RoadPricingSchemeUsingTollFactor stuff = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
+        RoadPricingSchemeUsingTollFactor rp = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
+
+
+        for (ConfigGroup group : config.getModules().values()) {
+            System.out.println("Loaded config group: " + group.getName());
+        }
 
         //create Controller and run
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule( new RoadPricingModule( stuff ) );
+        controler.addOverridingModule( new RoadPricingModule( rp ) );
+        
 
         controler.run();
     }

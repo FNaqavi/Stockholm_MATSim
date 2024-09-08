@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim</groupId>
-    <artifactId>matsim-Sthlm-project</artifactId>
+    <artifactId>STOCKHOLM_MATSIM</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Stockholm_MATSim</name> <!--Sthlm-try1-1-->
