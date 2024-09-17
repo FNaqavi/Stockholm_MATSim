@@ -3,10 +3,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim</groupId>
-    <artifactId>matsim-Sthlm-project</artifactId>
+    <artifactId>STOCKHOLM_MATSIM_DRT</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>Stockholm_MATSim</name> <!--Sthlm-try1-1-->
+    <name>Stockholm_MATSim_Drt</name>
     <description>Sthlm-try 1</description>
 
     <properties>
@@ -15,7 +15,7 @@
         <matsim.version>16.0-2024w08</matsim.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>17</maven.compiler.release>  
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
 
@@ -57,15 +57,16 @@
         <dependency>
             <groupId>org.matsim</groupId>
             <artifactId>matsim-all</artifactId>
-            <version>16.0-2024w01</version>
+            <version>${matsim.version}</version>
+<!--            <version>16.0-2024w01</version>-->
             <type>pom</type>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>32.0.0-jre</version>
-        </dependency>
+        </dependency>-->
 
 
 
@@ -183,7 +184,8 @@
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>drt</artifactId>
-            <version>16.0-2024w01</version>
+            <version>${matsim.version}</version>
+<!--            <version>16.0-2024w01</version>-->
         </dependency>
 
 
@@ -238,7 +240,7 @@
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.16.1</version>
         </dependency>
-
+      
     </dependencies>
 
     <build>

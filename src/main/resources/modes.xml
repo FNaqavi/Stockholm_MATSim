@@ -10,6 +10,16 @@
         <doorOperation mode="serial"/>
         <passengerCarEquivalents pce="1.0"/>
     </vehicleType>
+
+    <vehicleType id="drt">
+        <length meter="7.5"/>
+        <width meter="1.0"/>
+        <maximumVelocity meterPerSecond="16.67"/>
+        <accessTime secondsPerPerson="1.0"/>
+        <egressTime secondsPerPerson="1.0"/>
+        <doorOperation mode="serial"/>
+        <passengerCarEquivalents pce="1.0"/>
+    </vehicleType>
 <!--    <vehicleType id="bicycle">
         <length meter="7.5"/>
         <width meter="1.0"/>

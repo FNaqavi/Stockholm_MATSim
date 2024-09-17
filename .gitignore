@@ -1,0 +1,5 @@
+/output
+gc.log*
+/src/main/gui
+/target
+*.jar

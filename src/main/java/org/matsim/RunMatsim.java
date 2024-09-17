@@ -19,22 +19,30 @@
 package org.matsim;
 
 
+import static org.matsim.contrib.drt.run.DrtControlerCreator.*;
+
 import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.roadpricing.*;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeUsingTollFactor;
+import org.matsim.contrib.roadpricing.TollFactor;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
+//import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+//import org.matsim.run.NetworkCleaner;
 
-import static org.matsim.contrib.drt.run.DrtControlerCreator.createScenarioWithDrtRouteFactory;
+
 
 public class RunMatsim {
 
@@ -42,30 +50,63 @@ public class RunMatsim {
 
         Config config;
         if (args == null || args.length == 0 || args[0] == null) {
-            config = ConfigUtils.loadConfig("./matsim-config.xml");
+            String fileName = String.format("matsim-config.xml");
+            config = ConfigUtils.loadConfig(fileName);
         } else {
             config = ConfigUtils.loadConfig(args);
         }
+        runIt(config);
+    }
 
+
+
+/*        for (int i = 0; i < 2; i++) {
+            Config config;
+            if (args == null || args.length == 0 || args[0] == null) {
+                String fileName = String.format("./all-configs/%d/matsim-config-%d.xml", i+1,i+1);
+                config = ConfigUtils.loadConfig(fileName);
+            } else {
+                config = ConfigUtils.loadConfig(args);
+            }
+            runIt(config);
+        }
+
+    }*/
+
+
+    private static void runIt(Config config) {
+        
+/*         String inputNetworkFile = config.network().getInputFile();
+        String outputNetworkFile = "cleaned-network.xml"; // Define the output file where the cleaned network will be saved
+        new NetworkCleaner().run(inputNetworkFile, outputNetworkFile);
+        config.network().setInputFile("/cfs/klemming/home/n/naqavi/matsim/Stockholm_MATSim_Drt/cleaned-network.xml");  */
+
+        
         //add RoadPricing ConfigGroup
         RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
-        rpConfig.setTollLinksFile("cordonToll1.xml");
+        MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+        ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 
-        config.controller().setOverwriteFileSetting((OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists));
+        
+        //MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+        DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+
 
         //load config into scenario
         Scenario scenario = createScenarioWithDrtRouteFactory(config);
         ScenarioUtils.loadScenario(scenario);
 
+
         //split parallel links between same nodes
-        NetworkSegmentDoubleLinks algorithm = new NetworkSegmentDoubleLinks();
-        algorithm.run(scenario.getNetwork());
+        // NetworkSegmentDoubleLinks algorithm = new NetworkSegmentDoubleLinks();
+        // algorithm.run(scenario.getNetwork());
+
 
         // define the toll factor as an anonymous class.  If more flexibility is needed, convert to "full" class.
         TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
             //          if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
             if (scenario.getVehicles().getVehicles().get(vehicleId) == null) {
-                if (vehicleId.toString().contains("taxi")) {
+                if (vehicleId.toString().contains("drt")) {
                     return 1;
                 } else {
                     return 0;
@@ -80,26 +121,23 @@ public class RunMatsim {
         // instantiate the road pricing scheme, with the toll factor inserted:
         URL roadpricingUrl;
         roadpricingUrl = IOUtils.extendUrl(config.getContext(), rpConfig.getTollLinksFile());
-        RoadPricingSchemeUsingTollFactor rpricing = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
+        RoadPricingSchemeUsingTollFactor rp = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
 
-        MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-        DvrpConfigGroup dvrpConfigGroup = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-        //MultiModeTaxiConfigGroup multiModeTaxiConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeTaxiConfigGroup.class);
 
         config.checkConsistency();
-        MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-        DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
-
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new DvrpModule());
         controler.addOverridingModule(new MultiModeDrtModule());
-        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+        controler.addOverridingModule(new DvrpModule());
+
+        
+        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig)); // if removed, throws event handling error
 
         //create Controller and run
-        controler.addOverridingModule(new RoadPricingModule( rpricing ));
-
-
+        controler.addOverridingModule(new RoadPricingModule(rp));
         controler.run();
-
+        
+        
     }
 }
+
+

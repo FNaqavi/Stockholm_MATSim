@@ -5,12 +5,12 @@
 
     <module name="global">
         <!-- Oskar 2015-12-09, use 24 threads for replanning. Shortest path algorithm. -->
-        <param name="numberOfThreads" value="22"/>
+        <param name="numberOfThreads" value="32"/>
         <param name="coordinateSystem" value="EPSG:3006"/>
     </module>
 
     <module name="network">
-        <param name="inputNetworkFile" value="./sthlm_v3.xml"/>
+        <param name="inputNetworkFile" value="sthlm_v3.xml"/>
         <param name="timeVariantNetwork" value="true"/>
     </module>
 
@@ -20,25 +20,22 @@
         <!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim
         Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
         For 'qsim', add a module 'qsim' to the config. -->
-        <!--  type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks &ndash -->
-        <param name="routingAlgorithmType" value="Dijkstra"/>  <!-- previous value FastAStarLandmarks&ndash -->
+        <param name="routingAlgorithmType" value= "Dijkstra" />   <!--changed-->
         <param name="mobsim" value="qsim"/>
         <param name="overwriteFiles" value="deleteDirectoryIfExists"/>
-        <param name="outputDirectory" value="./output"/>
+        <param name="outputDirectory" value="output/"/>
+        <param name="overwriteFiles" value="overwriteExistingFiles"/>
         <param name="firstIteration" value="1"/>
-        <param name="lastIteration" value="50"/> <!-- original value 100 -->
+        <param name="lastIteration" value="20"/> <!-- original value 100 -->
     </module>
 
     <module name="plans">
-        <param name="inputPlansFile" value="./matsim-plans-2040_25b.xml"/>
+        <param name="inputPlansFile" value="matsim-plans-2040_25_June13.xml"/>
         <parameterset type="strategySettings">
-            <param name="ChangeExpBeta" value="0.1"/>
-            <param name="beta" value="1.0"/>
-            <param name="changeExpBeta.mu" value="1.0"/>
-            <param name="changeExpBeta.lambda" value="1.0"/>
             <param name="immutableModes" value="car:h, bike:h"/>
             <!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
             <param name="networkRouteType" value="LinkNetworkRoute"/>
+            <param name="activityDurationInterpretation" value="tryEndTimeThenDuration"/>   <!-- endTimeOnly -->
         </parameterset>
     </module>
 
@@ -48,42 +45,44 @@
         <param name="fractionOfIterationsToDisableInnovation"
                value="0.5"/>    <!-- 0.3 is good --> <!-- fraction of iterations where innovative strategies are switched off. if you set it to 0.8 and run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
         <param name="planSelectorForRemoval" value="WorstPlanForRemovalSelectorWithConflicts"/>
+        
         <parameterset type="strategysettings">
             <param name="strategyName" value="ReRoute"/>
-            <param name="weight" value="0.50"/>   <!-- 0.2 is good -->
+            <param name="weight" value="0.1"/>   <!-- 0.5--> <!-- 0.2 is good  (last run 0.4: 0.48 car, 0.30 pt; 0.5 improved the mode share slightly, currently 0.7)-->  
         </parameterset>
-        <parameterset type="strategysettings">
+       <parameterset type="strategysettings">
             <param name="strategyName" value="SelectExpBeta"/>
-            <param name="weight" value="1"/>  <!-- it was originally set to 0.75-->
-        </parameterset>
+            <param name="weight" value="0.6"/>   <!-- 1-->
+       </parameterset>
+
         <parameterset type="strategysettings">
             <param name="strategyName" value="TimeAllocationMutator"/>
-            <param name="weight" value="0.25"/>
-        </parameterset>
+            <param name="weight" value="0.1"/>  <!-- 0.25-->
+        </parameterset>    
+            
         <parameterset type="strategysettings">
             <param name="strategyName" value="ChangeTripMode"/>
-            <param name="weight" value="0.5"/>  <!-- 0.3 is good -->
+            <param name="weight" value="0.3"/>   <!-- 0.5-->
         </parameterset>
     </module>
 
 
     <module name="qsim">
-<!--        <param name="vehiclesSource"
-               value="defaultVehicle"/>   &lt;!&ndash; a medium-sized 4-seater every time a vehicle is needed &ndash;&gt;-->
-        <param name="flowCapacityFactor" value="0.1"/>
-        <param name="storageCapacityFactor" value="0.18"/> <!-- 0.18 when flowCapacityFactor is 0.1-->
+        <param name="vehiclesSource"
+               value="defaultVehicle"/>   <!-- a medium-sized 4-seater every time a vehicle is needed -->
+        <param name="flowCapacityFactor" value="0.30"/>
+        <param name="storageCapacityFactor" value="0.50"/> <!-- 0.18 when flowCapacityFactor is 0.1-->
         <param name="startTime" value="00:00:00"/>
         <param name="endTime" value="30:00:00"/>
         <param name="mainMode" value="car"/>
         <param name="simEndtimeInterpretation" value="onlyUseEndtime"/>
-        <param name="linkDynamics"
-               value="PassingQ"/>  <!-- allows vehicles with higher speed to exit the link sooner  -->
+        <param name="linkDynamics" value="PassingQ"/>  <!-- allows vehicles with higher speed to exit the link sooner  -->
         <!-- Oskar 2015-12-09, use 22 threads for qsim (mobsim). Queuing simulation. -->
-        <param name="numberOfThreads" value="22"/>
+        <param name="numberOfThreads" value="32"/>
         <param name="trafficDynamics" value="kinematicWaves"/>  <!-- allows for double queue -->
         <param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
-        <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="false"/>
-        <param name="removeStuckVehicles" value="false"/>
+        <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>   
+        <param name="removeStuckVehicles" value="false"/>  <!--changed-->
         <param name="stuckTime" value="1"/>
         <param name="vehicleBehavior" value="wait"/>
         <param name="snapshotStyle" value="queue"/>
@@ -93,7 +92,7 @@
 
     <module name="counts">
         <!-- Transport modes that will be respected for the counts comparison. 'car' is default, which includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true! -->
-        <param name="analyzedModes" value="car, drt"/>
+        <param name="analyzedModes" value="car,drt"/>
         <!-- Specifies over how many iterations the link volumes should be averaged that are used for the counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeCountsInterval -->
         <param name="averageCountsOverIterations" value="5"/>
         <!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
@@ -117,11 +116,11 @@
 
     <module name="eventsManager">        <!-- Config name 'parallelEventHandling' is deprecated, please use 'eventsManager' instead. -->
         <!-- Oskar 2015-12-09, use 1 threads for event handling -->
-        <param name="numberOfThreads" value="1"/>
+        <param name="numberOfThreads" value="32"/>
     </module>
 
     <module name="travelTimeCalculator">
-        <param name="analyzedModes" value="car, drt"/>
+        <param name="analyzedModes" value="car,drt"/>
         <param name="calculateLinkToLinkTravelTimes" value="false"/>
         <param name="calculateLinkTravelTimes" value="true"/>
         <param name="filterModes" value="true"/>
@@ -139,6 +138,7 @@
 
     <!-- This part is from matsim-sweden project -->
     <module name="scoring">                    <!-- Config name 'planCalcScore' is deprecated, please use 'scoring' instead. -->
+        <param name="writeExperiencedPlans" value="true"/>
         <parameterset type="scoringParameters">
             <param name="subpopulation" value="null"/>
             <param name="performing" value="6.0"/>
@@ -192,6 +192,17 @@
             <param name="marginalUtilityOfTraveling_util_hr" value="-0.10"/>  <!-- -0.100 -->
             <param name="monetaryDistanceRate" value="-0.0002"/>
         </parameterset>
+
+        <parameterset type="modeParams">
+            <param name="mode" value="drt"/>
+            <param name="dailyMonetaryConstant" value="0.0"/>
+            <param name="dailyUtilityConstant" value="0.0"/>
+            <param name="constant" value="0.0"/>
+            <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+            <param name="marginalUtilityOfTraveling_util_hr" value="-0.100"/>
+            <param name="monetaryDistanceRate" value="-0.0002"/>
+        </parameterset>
+
         <parameterset type="modeParams">
             <param name="mode" value="pt"/>
             <param name="dailyMonetaryConstant" value="0.0"/>
@@ -206,7 +217,7 @@
             <param name="dailyMonetaryConstant" value="0.0"/>
             <param name="dailyUtilityConstant" value="-0.0"/>   <!-- 0.0 -->
             <param name="constant" value="-2.0"/>
-            <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+            <param name="marginalUtilityOfDistance_util_m" value="-0.0"/>
             <param name="marginalUtilityOfTraveling_util_hr" value="-0.073"/>  <!-- -0.073 -->
             <param name="monetaryDistanceRate" value="-0.0002"/>
         </parameterset>
@@ -244,21 +255,17 @@
         <param name="beelineDistanceFactor" value="1.7"/>  <!-- This was good with 1.8-->
         <parameterset type="teleportedModeParameters">
             <param name="mode" value="pt"/>
-            <param name="beelineDistanceFactor" value="null"/>
-            <!--matsim uses m/s for speed instead of km/hr-->
-            <param name="teleportedModeSpeed" value="9.0"/>  <!-- 10 was good -->
+            <param name="teleportedModeSpeed" value="9.0"/>  
             <param name="teleportedModeFreespeedFactor" value="null"/>
         </parameterset>
         <parameterset type="teleportedModeParameters">
             <param name="mode" value="walk"/>
-            <param name="beelineDistanceFactor" value="null"/>
             <param name="teleportedModeSpeed" value="0.5"/>
             <param name="teleportedModeFreespeedFactor" value="null"/>
         </parameterset>
         <parameterset type="teleportedModeParameters">
             <param name="mode" value="bike"/>
-            <param name="beelineDistanceFactor" value="null"/>
-            <param name="teleportedModeSpeed" value="2.6"/>  <!-- 10 was good -->
+            <param name="teleportedModeSpeed" value="2.6"/>  
             <param name="teleportedModeFreespeedFactor" value="null"/>
         </parameterset>
     </module>
@@ -277,11 +284,11 @@
     <module name="timeAllocationMutator">
         <!--<param name="mutationRange" value="900.0" /> -->
         <!-- Default:true; Defines whether time mutation changes an activity's duration. -->
-        <param name="mutationAffectsDuration" value="true"/> <!--changed-->
+        <param name="mutationAffectsDuration" value="false"/>
     </module>
 
     <module name="roadpricing">
-        <param name="tollLinksFile" value="./cordonToll1.xml"/>
+        <param name="tollLinksFile" value="cordonToll.xml"/>
     </module>
 
     <module name="vehicles">
@@ -289,41 +296,52 @@
     </module>
 
 
+    <!-- ====================================================================== -->
+
     <module name="multiModeDrt">
         <parameterset type="drt">
+            <!--param name="useModeFilteredSubnetwork" value="true"/-->
             <parameterset type="ExtensiveInsertionSearch"/>
+
             <!-- If true, the startLink is changed to last link in the current schedule, so the taxi starts the next day at the link where it stopped operating the day before. False by default. -->
             <param name="changeStartLinkToLastLinkInSchedule" value="true"/>
-
-            <!-- allows to configure a service area per drt mode.Used with serviceArea Operational Scheme -->
-            <param name="drtServiceAreaShapeFile" value="./center.shp" />
-
             <!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
-            <param name="maxTravelTimeAlpha" value="2"/>
+            <param name="operationalScheme" value="serviceAreaBased"/>
+            <!-- allows to configure a service area per drt mode.Used with serviceArea Operational Scheme -->
+            <param name="drtServiceAreaShapeFile" value="center1.shp" />
+
+            <param name="maxTravelTimeAlpha" value="1.5"/>
             <!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
-            <param name="maxTravelTimeBeta" value="900.0"/>  <!--900 in Berlin, 1200 in NYC-->
+            <param name="maxTravelTimeBeta" value="900.0"/>
             <!-- Max wait time for the bus to come (optimisation constraint). -->
             <param name="maxWaitTime" value="600.0"/>
+
             <!-- Operational Scheme, either door2door or stopbased. door2door by default -->
-            <param name="operationalScheme" value="serviceAreaBased"/>
+            <param name="operationalScheme" value="door2door"/>
+
             <!-- Bus stop duration. -->
             <param name="stopDuration" value="10.0"/>
+
             <!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
-            <param name="vehiclesFile" value="drtvehicles.xml"/>
+            <param name="vehiclesFile" value="drt_vehicles_500.xml"/>
+
             <!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
             <param name="writeDetailedCustomerStats" value="true"/>
+
             <parameterset type="zonalSystem">
                 <param name="zonesGeneration" value="GridFromNetwork"/>
-                <param name="cellSize" value="500"/>  <!--500 in Berlin, 250 in NYC-->
+                <param name="cellSize" value="500"/>
             </parameterset>
+
             <parameterset type="rebalancing">
                 <parameterset type="minCostFlowRebalancingStrategy">
                     <param name="targetAlpha" value="0.5"/>
                     <param name="targetBeta" value="0.5"/>
                 </parameterset>
             </parameterset>
+
             <parameterset type="drtfare">
-                <param name="basefare" value="1"/>
+                <param name="basefare" value="0.5"/>
                 <!-- Daily subscription fee (fee = positive value) -->
                 <param name="dailySubscriptionFee" value="0.0"/>
                 <!-- drt fare per meter (fee = positive value) -->
@@ -331,7 +349,7 @@
                 <!-- drt fare per hour (fee = positive value) -->
                 <param name="timeFare_h" value="3.6"/>
                 <!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
-                <param name="minFarePerTrip" value="0.0"/>   <!--was not used in Berlin or NYC cases-->
+                <param name="minFarePerTrip" value="2.0"/>
             </parameterset>
         </parameterset>
     </module>
@@ -339,14 +357,15 @@
     <module name="dvrp">
 
         <parameterset type="travelTimeMatrix">
-            <param name="cellSize" value="200"/>   <!--1000 in Berlin, 200 in NYC-->
-            <param name="maxNeighborDistance" value="5000"/>   <!--10000 in Berlin, 5000 in NYC-->
+            <param name="cellSize" value="100"/>
+            <param name="maxNeighborDistance" value="100"/>
         </parameterset>
-
+        
         <!-- Mode of which the network will be used for routing vehicles, calculating travel times, etc. (fleet operator's perspective). If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used -->
         <param name="networkModes" value="car"/>
         <!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
         <param name="travelTimeEstimationAlpha" value="0.05"/>
     </module>
+
 
 </config>
