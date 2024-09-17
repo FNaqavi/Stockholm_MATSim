@@ -70,8 +70,8 @@
     <module name="qsim">
         <param name="vehiclesSource"
                value="defaultVehicle"/>   <!-- a medium-sized 4-seater every time a vehicle is needed -->
-        <param name="flowCapacityFactor" value="0.1"/>
-        <param name="storageCapacityFactor" value="0.18"/> <!-- 0.18 when flowCapacityFactor is 0.1-->
+        <param name="flowCapacityFactor" value="0.3"/> <!-- scales the maximum number of vehicles that can traverse a link per unit of time. Aligned with population scaling-->
+        <param name="storageCapacityFactor" value="0.5"/> <!-- flowCapacityFactor ^ 0.75 --> <!-- 0.18 when flowCapacityFactor is 0.1-->
         <param name="startTime" value="00:00:00"/>
         <param name="endTime" value="30:00:00"/>
         <param name="mainMode" value="car"/>
