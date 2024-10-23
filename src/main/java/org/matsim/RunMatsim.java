@@ -17,7 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim;
-
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +31,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.run.NetworkCleaner;
+
 
 public class RunMatsim {
 
@@ -44,9 +45,16 @@ public class RunMatsim {
         config = ConfigUtils.loadConfig(args);
         }
 
+
+        String inputNetworkFile = config.network().getInputFile();
+        String outputNetworkFile = "cleaned-network.xml"; // Define the output file where the cleaned network will be saved
+        new NetworkCleaner().run(inputNetworkFile, outputNetworkFile);
+        config.network().setInputFile("/cfs/klemming/home/n/naqavi/matsim/Stockholm_MATSim/cleaned-network.xml");  
+
+
         //add RoadPricing ConfigGroup
         RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
-        rpConfig.setTollLinksFile("cordonToll.xml");
+        rpConfig.setTollLinksFile("toll_osm.xml");
 
         config.controller().setOverwriteFileSetting((OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists));
 
@@ -58,7 +66,7 @@ public class RunMatsim {
             if(scenario.getVehicles().getVehicles().get(vehicleId) == null){
                 return 0;
                 } else if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
-                    return 1;
+                    return 0;
                 } else {
                     return 0;
                 }
