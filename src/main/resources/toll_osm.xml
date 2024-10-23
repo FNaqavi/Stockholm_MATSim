@@ -1,0 +1,71 @@
+<roadpricing type="link" name="cordon-toll">
+  <!--  this file is for osm network.xml  -->
+  <description>A simple cordon toll scheme for the osm network.</description>
+  <links>
+    <link id="1950272100003f"/>
+    <link id="1555803720006f"/>
+    <link id="6247263880003f"/>
+    <link id="1938111300011f"/>
+    <link id="1938111290019f"/>
+    <link id="2038633370011f"/>
+    <link id="52006660006f"/>
+    <link id="2541156960007f"/>
+    <link id="47266070011f"/>
+    <link id="52006690009f"/>
+    <link id="732206320004f"/>
+    <link id="431571760007f"/>
+    <link id="264474300001f"/>
+    <link id="264474300001r"/>
+    <link id="8980369280001f"/>
+    <link id="8980369290001f"/>
+    <link id="148697100010f"/>
+    <link id="1480022510010f"/>
+    <link id="2378240580003f"/>
+    <link id="158066510001f"/>
+    <link id="8044426170002f"/>
+    <link id="378351530006f"/>
+    <link id="272524770011f"/>
+    <link id="45884700004f"/>
+    <link id="42154160005f"/>
+    <link id="2999851420006f"/>
+    <link id="51790080004f"/>
+    <link id="49690590004f"/>
+    <link id="2999980100008f"/>
+    <link id="286007460008f"/>
+    <link id="3690179660005f"/>
+    <link id="311051770005f"/>
+    <link id="7585767420006f"/>
+    <link id="198778440007f"/>
+    <link id="4478674920005f"/>
+    <link id="6880390690001f"/>
+    <link id="228849570001f"/>
+    <link id="1895946220012f"/>
+    <link id="3659053330006f"/>
+    <link id="2107322520007f"/>
+    <link id="761690200009f"/>
+    <link id="2914644840007f"/>
+    <link id="7633371810000f"/>
+    <link id="754654360005f"/>
+    <link id="354039860027f"/>
+    <link id="354036890022f"/>
+    <link id="6224550690004f"/>
+    <link id="415293920002f"/>
+    <link id="6163716980007f"/>
+    <link id="6163716970009f"/>
+    <link id="48802050007f"/>
+    <link id="273490590002f"/>
+    <link id="239970120003f"/>
+    <link id="48124540006f"/>
+  </links>
+  
+  <!--  amount: [monetary unit] / [traveling across a tolled link.]  -->
+  <cost start_time="06:30" end_time="07:00" amount="10.00"/>
+  <cost start_time="07:00" end_time="07:30" amount="15.00"/>
+  <cost start_time="07:30" end_time="08:30" amount="20.00"/>
+  <cost start_time="08:30" end_time="09:00" amount="15.00"/>
+  <cost start_time="09:00" end_time="15:30" amount="10.00"/>
+  <cost start_time="15:30" end_time="16:00" amount="15.00"/>
+  <cost start_time="16:00" end_time="17:30" amount="20.00"/>
+  <cost start_time="17:30" end_time="18:00" amount="15.00"/>
+  <cost start_time="18:00" end_time="18:30" amount="10.00"/>
+</roadpricing>

@@ -9,7 +9,7 @@
     </module>
 
     <module name="network">
-        <param name="inputNetworkFile" value="sthlm_v3.xml"/>
+        <param name="inputNetworkFile" value="matsim-network.xml.gz"/>
         <param name="timeVariantNetwork" value="true"/>
     </module>
 
@@ -278,7 +278,7 @@
     </module>
 
     <module name="roadpricing">
-        <param name="tollLinksFile" value="cordonToll.xml"/>
+        <param name="tollLinksFile" value="toll_osm.xml"/>
     </module>
 
     <module name="vehicles">
