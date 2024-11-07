@@ -4,7 +4,7 @@
     <vehicleType id="car">
         <length meter="7.5"/>
         <width meter="1.0"/>
-        <maximumVelocity meterPerSecond="16.67"/>
+        <maximumVelocity meterPerSecond="12.5"/> <!-- 16.67 -->
         <accessTime secondsPerPerson="1.0"/>
         <egressTime secondsPerPerson="1.0"/>
         <doorOperation mode="serial"/>

@@ -6,7 +6,7 @@
     <artifactId>STOCKHOLM_MATSIM</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>Stockholm_MATSim</name> <!--Sthlm-try1-1-->
+    <name>Stockholm_MATSim</name>
     <description>Sthlm-try 1</description>
 
     <properties>
@@ -15,7 +15,7 @@
         <matsim.version>16.0-2024w08</matsim.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>17</maven.compiler.release>  
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
 
@@ -50,31 +50,15 @@
 
     </repositories>
 
-
-
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.matsim/matsim-all -->
         <dependency>
             <groupId>org.matsim</groupId>
             <artifactId>matsim-all</artifactId>
-            <version>16.0-2024w01</version>
+            <version>${matsim.version}</version>
+<!--            <version>16.0-2024w01</version>-->
             <type>pom</type>
         </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>32.0.0-jre</version>
-        </dependency>
-
-
-
-        <!--        <dependency>
-                    &lt;!&ndash; This is the matsim "core": &ndash;&gt;
-                    <groupId>org.matsim</groupId>
-                    <artifactId>matsim</artifactId>
-                    <version>${matsim.version}</version>
-                </dependency>-->
 
         <dependency>
             <groupId>org.matsim.contrib</groupId>
@@ -169,21 +153,12 @@
             <version>0.10.4</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api -->
-        <!--
-                <dependency>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                    <version>4.0.1</version>
-                </dependency>
-        -->
-
-
         <!-- https://mvnrepository.com/artifact/org.matsim.contrib/drt -->
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>drt</artifactId>
-            <version>16.0-2024w01</version>
+            <version>${matsim.version}</version>
+<!--            <version>16.0-2024w01</version>-->
         </dependency>
 
 
@@ -193,21 +168,7 @@
             <artifactId>dvrp</artifactId>
             <version>16.0-2024w01</version>
         </dependency>
-        <!--
-                <dependency>
-                    <groupId>org.lz4</groupId>
-                    <artifactId>lz4-java</artifactId>
-                    <version>1.8.0</version>
-                </dependency>-->
 
-        <!--
-
-               <dependency>
-                    <groupId>org.matsim.contrib</groupId>
-                    <artifactId>simwrapper</artifactId>
-                    <version>${matsim.version}</version>
-                </dependency>
-        -->
         <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
@@ -238,7 +199,7 @@
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.16.1</version>
         </dependency>
-
+      
     </dependencies>
 
     <build>
@@ -272,7 +233,7 @@
                                 <!-- The following sets the main class for the executable jar as you otherwise would with the assembly plugin -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>org.matsim.gui.MATSimGUI</Main-Class>
+                                        <Main-Class>org.matsim.RunMatsim</Main-Class>
                                         <Specification-Vendor>org.matsim</Specification-Vendor>
                                         <Implementation-Vendor>org.matsim</Implementation-Vendor>
                                         <Implementation-Version>${project.version}</Implementation-Version>
@@ -299,8 +260,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
+                <configuration>
+                    <source>${maven.compiler.release}</source>
+                    <target>${maven.compiler.release}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 </project>
-

@@ -17,6 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim;
+
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
@@ -31,8 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.run.NetworkCleaner;
-
+//import org.matsim.run.NetworkCleaner;
 
 public class RunMatsim {
 
@@ -40,52 +40,72 @@ public class RunMatsim {
 
         Config config;
         if (args == null || args.length == 0 || args[0] == null) {
-        config = ConfigUtils.loadConfig("matsim-config.xml");
+            config = ConfigUtils.loadConfig("matsim-config.xml");
         } else {
-        config = ConfigUtils.loadConfig(args);
+            config = ConfigUtils.loadConfig(args);
         }
+        runIt(config);
+    }
 
+    /*
+     * for (int i = 0; i < 2; i++) {
+     * Config config;
+     * if (args == null || args.length == 0 || args[0] == null) {
+     * String fileName = String.format("./all-configs/%d/matsim-config-%d.xml",
+     * i+1,i+1);
+     * config = ConfigUtils.loadConfig(fileName);
+     * } else {
+     * config = ConfigUtils.loadConfig(args);
+     * }
+     * runIt(config);
+     * }
+     * 
+     * }
+     */
 
-        String inputNetworkFile = config.network().getInputFile();
-        String outputNetworkFile = "cleaned-network.xml"; // Define the output file where the cleaned network will be saved
-        new NetworkCleaner().run(inputNetworkFile, outputNetworkFile);
-        config.network().setInputFile("/cfs/klemming/home/n/naqavi/matsim/Stockholm_MATSim/cleaned-network.xml");  
+    private static void runIt(Config config) {
 
+        // String inputNetworkFile = config.network().getInputFile();
+        // String outputNetworkFile = "cleaned-network.xml"; // Define the output file
+        // where the cleaned network will be saved
+        // new NetworkCleaner().run(inputNetworkFile, outputNetworkFile);
+        // config.network().setInputFile("matsim-network.xml.gz");
 
-        //add RoadPricing ConfigGroup
+        // add RoadPricing ConfigGroup
         RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
         rpConfig.setTollLinksFile("toll_osm.xml");
 
-        config.controller().setOverwriteFileSetting((OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists));
+        config.controller()
+                .setOverwriteFileSetting((OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists));
 
-        //load config into scenario
+        // load config into scenario
         final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        // define the toll factor as an anonymous class.  If more flexibility is needed, convert to "full" class.
+        // define the toll factor as an anonymous class. If more flexibility is needed,
+        // convert to "full" class.
         TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
-            if(scenario.getVehicles().getVehicles().get(vehicleId) == null){
+            if (scenario.getVehicles().getVehicles().get(vehicleId) == null) {
                 return 0;
-                } else if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
-                    return 0;
-                } else {
-                    return 0;
-                }
-            };
+            } else if (scenario.getVehicles().getVehicles().get(vehicleId).getType().getNetworkMode().equals("car")) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
 
         // instantiate the road pricing scheme, with the toll factor inserted:
         URL roadpricingUrl;
         roadpricingUrl = IOUtils.extendUrl(config.getContext(), rpConfig.getTollLinksFile());
-        RoadPricingSchemeUsingTollFactor rp = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
-
+        RoadPricingSchemeUsingTollFactor rp = RoadPricingSchemeUsingTollFactor
+                .createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario);
 
         for (ConfigGroup group : config.getModules().values()) {
             System.out.println("Loaded config group: " + group.getName());
         }
 
-        //create Controller and run
+        // create Controller and run
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule( new RoadPricingModule( rp ) );
-        
+        controler.addOverridingModule(new RoadPricingModule(rp));
 
         controler.run();
     }

@@ -9,7 +9,7 @@
     </module>
 
     <module name="network">
-        <param name="inputNetworkFile" value="matsim-network.xml.gz"/>
+        <param name="inputNetworkFile" value="cleaned-network.xml"/>
         <param name="timeVariantNetwork" value="true"/>
     </module>
 
@@ -26,7 +26,7 @@
         <param name="outputDirectory" value="output/"/>
         <param name="overwriteFiles" value="overwriteExistingFiles"/>
         <param name="firstIteration" value="1"/>
-        <param name="lastIteration" value="60"/> <!-- original value 100 -->
+        <param name="lastIteration" value="48"/> <!-- original value 100 -->
     </module>
 
     <module name="plans">
@@ -42,7 +42,7 @@
     <module name="replanning">
         <param name="maxAgentPlanMemorySize" value="5"/> <!-- 0 means unlimited -->
         <param name="fractionOfIterationsToDisableInnovation"
-               value="0.5"/>    <!-- 0.3 is good --> <!-- fraction of iterations where innovative strategies are switched off. if you set it to 0.8 and run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
+               value="0.4"/>  <!-- fraction of iterations where innovative strategies are switched off. if you set it to 0.8 and run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
         <param name="planSelectorForRemoval" value="WorstPlanForRemovalSelectorWithConflicts"/>
         
         <parameterset type="strategysettings">
@@ -51,7 +51,7 @@
         </parameterset>
        <parameterset type="strategysettings">
             <param name="strategyName" value="SelectExpBeta"/>
-            <param name="weight" value="0.6"/>   <!-- 1-->
+            <param name="weight" value="0.5"/>   <!-- 1-->
        </parameterset>
 
         <parameterset type="strategysettings">
@@ -219,7 +219,7 @@
             <param name="dailyMonetaryConstant" value="0.0"/>
             <param name="dailyUtilityConstant" value="-0.0"/>   <!-- 0.0 -->
             <param name="constant" value="-2.0"/>
-            <param name="marginalUtilityOfDistance_util_m" value="-0.0"/>
+            <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
             <param name="marginalUtilityOfTraveling_util_hr" value="-0.073"/>  <!-- -0.073 -->
             <param name="monetaryDistanceRate" value="-0.0002"/>
         </parameterset>
@@ -228,37 +228,32 @@
             <param name="mode" value="bike"/>
             <param name="dailyMonetaryConstant" value="0.0"/>
             <param name="dailyUtilityConstant" value="0.0"/>
-            <param name="constant" value="-1.0"/>   <!-- -2.0 -->
-            <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+            <param name="constant" value="-1.0"/>  
+            <param name="marginalUtilityOfDistance_util_m" value="-0.0"/>
             <param name="marginalUtilityOfTraveling_util_hr" value="-0.077"/>  <!-- -0.077 -->
             <param name="monetaryDistanceRate" value="-0.0002"/>
         </parameterset>
     </module>
 
     <module name="routing">  <!-- This section is for teleported modes-->
-        <param name="beelineDistanceFactor" value="1.8"/>  <!-- This was good with 1.8-->
+        <!--param name="beelineDistanceFactor" value="1.5"/-->  
 
         <parameterset type="teleportedModeParameters">
-            <param name="mode" value="pt"/>
-            <param name="beelineDistanceFactor" value="null"/>
-            <!--matsim uses m/s for speed instead of km/hr-->
-            <param name="teleportedModeSpeed" value="9.0"/>  <!-- 10 was good -->
-            <param name="teleportedModeFreespeedFactor" value="null"/>
-        </parameterset>
+			<param name="beelineDistanceFactor" value="1.8" />
+			<param name="mode" value="pt" />
+			<param name="teleportedModeSpeed" value="9.0" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.8" />
+			<param name="mode" value="walk" />
+			<param name="teleportedModeSpeed" value="0.5" />
+		</parameterset>
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.8" />
+			<param name="mode" value="bike" />
+			<param name="teleportedModeSpeed" value="2.6" />
+		</parameterset>
 
-        <parameterset type="teleportedModeParameters">
-            <param name="mode" value="walk"/>
-            <!--param name="beelineDistanceFactor" value="1.5"/-->
-            <param name="teleportedModeSpeed" value="0.5"/>
-            <param name="teleportedModeFreespeedFactor" value="null"/>
-        </parameterset>
-
-        <parameterset type="teleportedModeParameters">
-            <param name="mode" value="bike"/>
-            <!--param name="beelineDistanceFactor" value="1.5"/ -->
-            <param name="teleportedModeSpeed" value="2.6"/>  <!-- 10 was good -->
-            <param name="teleportedModeFreespeedFactor" value="null"/>
-        </parameterset>
     </module>
 
     <module name="changeMode">
